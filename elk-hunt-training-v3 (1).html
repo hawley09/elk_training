@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elk Hunt Training | Cooper</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0f1009;--bg2:#171810;--bg3:#1e2013;--bg4:#13140d;--border:#2e3120;--accent:#c8a84b;--accent2:#8fad3f;--accent3:#d4612a;--text:#e8e4d4;--muted:#8a8672;--dim:#5a5745;--danger:#c0392b;--green:#7b9e87;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;line-height:1.5;}
+  input{font-family:'DM Sans',sans-serif;}
+
+  .hdr{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 18px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+  .hdr-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--accent);}
+  .hdr-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+  .cd-num{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);line-height:1;text-align:right;}
+  .cd-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:right;}
+
+  .wrap{max-width:860px;margin:0 auto;padding:18px 13px 90px;}
+
+  .ph-bar{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap;}
+  .ph-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);cursor:pointer;border-radius:2px;transition:all 0.15s;}
+  .ph-btn.act{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+
+  .wk-bar{display:flex;gap:5px;margin-bottom:20px;flex-wrap:wrap;}
+  .wk-btn{font-family:'DM Mono',monospace;font-size:10px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);color:var(--dim);cursor:pointer;border-radius:2px;position:relative;transition:all 0.15s;}
+  .wk-btn.act{border-color:var(--accent2);color:var(--accent2);}
+  .wk-btn.done{border-color:var(--accent2);}
+  .wk-btn.done::after{content:'✓';position:absolute;top:-5px;right:-3px;font-size:9px;color:var(--accent2);}
+
+  .ph-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-bottom:13px;}
+
+  .day-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:13px;overflow:hidden;}
+  .day-card.outdoor{border-color:var(--green);}
+  .day-hdr{padding:12px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:var(--bg3);border-bottom:1px solid var(--border);}
+  .day-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;}
+  .day-title.gym{color:#6b9ed2;}
+  .day-title.outdoor{color:var(--green);}
+  .day-title.sat{color:var(--accent);}
+  .day-prog{display:flex;align-items:center;gap:7px;}
+  .prog-bar{width:60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .prog-fill{height:100%;background:var(--accent2);border-radius:2px;transition:width 0.3s;}
+  .prog-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:26px;text-align:right;}
+  .chv{color:var(--dim);font-size:11px;margin-left:5px;transition:transform 0.2s;}
+  .day-card.open .chv{transform:rotate(180deg);}
+  .day-body{display:none;padding:13px 15px;}
+  .day-card.open .day-body{display:block;}
+
+  .blk{margin-bottom:16px;}
+  .blk-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .blk-title::after{content:'';flex:1;height:1px;background:var(--border);}
+  .blk-title.green{color:var(--green);}
+
+  .ex{padding:9px 0;border-bottom:1px solid var(--border);}
+  .ex:last-child{border-bottom:none;}
+  .ex-top{display:flex;align-items:flex-start;gap:9px;}
+  .ex.done .ex-top{opacity:0.4;}
+  .chk{width:20px;height:20px;border:1px solid var(--border);border-radius:2px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all 0.15s;}
+  .chk:hover{border-color:var(--accent2);}
+  .chk.on{background:var(--accent2);border-color:var(--accent2);}
+  .chk.on::after{content:'✓';font-size:11px;color:var(--bg);font-weight:700;}
+  .ex-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px;}
+  .ex-detail{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);line-height:1.5;}
+  .ex-note{font-size:11px;color:var(--accent3);font-style:italic;margin-top:3px;}
+
+  .log-toggle{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);cursor:pointer;padding:4px 0 0 29px;display:inline-block;}
+  .log-panel{display:none;margin:7px 0 3px 29px;background:var(--bg4);border:1px solid var(--border);border-radius:3px;padding:9px 11px;}
+  .log-panel.open{display:block;}
+  .set-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:5px;}
+  .set-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);width:34px;flex-shrink:0;}
+  .set-fld{background:var(--bg3);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:4px 7px;width:65px;text-align:center;-moz-appearance:textfield;}
+  .set-fld::-webkit-outer-spin-button,.set-fld::-webkit-inner-spin-button{-webkit-appearance:none;}
+  .set-fld:focus{outline:none;border-color:var(--accent);}
+  .set-fld::placeholder{color:var(--dim);font-size:10px;}
+  .set-unit{font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);width:20px;}
+  .note-fld{background:var(--bg3);border:1px solid var(--border);border-radius:2px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 7px;flex:1;min-width:70px;}
+  .note-fld:focus{outline:none;border-color:var(--accent2);}
+  .note-fld::placeholder{color:var(--dim);font-size:10px;}
+  .log-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:7px;}
+  .add-btn{font-family:'DM Mono',monospace;font-size:9px;padding:4px 9px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;border-radius:2px;}
+  .add-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+  .rem-btn{font-family:'DM Mono',monospace;font-size:9px;padding:4px 7px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;border-radius:2px;}
+  .rem-btn:hover{border-color:var(--danger);color:var(--danger);}
+  .save-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:4px 11px;background:var(--accent2);border:1px solid var(--accent2);color:var(--bg);cursor:pointer;border-radius:2px;margin-left:auto;}
+  .save-conf{font-family:'DM Mono',monospace;font-size:9px;color:var(--accent2);display:none;}
+  .last-log{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);margin-top:7px;padding-top:7px;border-top:1px solid var(--border);line-height:1.7;}
+  .last-log .lv{color:var(--accent2);}
+
+  .cardio-fields{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:7px;}
+  .cf-wrap{display:flex;flex-direction:column;gap:2px;}
+  .cf-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;}
+  .cf{background:var(--bg3);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:4px 7px;width:75px;text-align:center;-moz-appearance:textfield;}
+  .cf::-webkit-outer-spin-button,.cf::-webkit-inner-spin-button{-webkit-appearance:none;}
+  .cf:focus{outline:none;border-color:var(--accent);}
+  .cf::placeholder{color:var(--dim);font-size:10px;}
+
+  .sec-lbl{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:4px;color:var(--muted);margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  .cmpl-btn{width:100%;padding:12px;background:transparent;border:1px solid var(--accent2);color:var(--accent2);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;margin-top:13px;}
+  .cmpl-btn:hover{background:var(--accent2);color:var(--bg);}
+
+  .view{display:none;}
+  .view.act{display:block;}
+
+  .ref-sec{margin-bottom:20px;}
+  .ref-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:var(--accent);margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  .ref-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted);line-height:1.6;}
+  .ref-item:last-child{border-bottom:none;}
+  .ref-item strong{color:var(--text);font-weight:500;}
+  .flag{display:flex;align-items:flex-start;gap:7px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);}
+  .flag:last-child{border-bottom:none;}
+  .fdot{width:6px;height:6px;border-radius:50%;background:var(--accent3);flex-shrink:0;margin-top:5px;}
+  .hr-box{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;padding:9px 12px;margin-bottom:12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);line-height:1.8;}
+  .hr-box .z2{color:var(--accent2);font-weight:500;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
+  .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:11px 9px;text-align:center;}
+  .stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);line-height:1;margin-bottom:3px;}
+  .stat-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);}
+  .wk-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:16px;}
+  .wk-dot{aspect-ratio:1;border-radius:2px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:8px;color:var(--dim);}
+  .wk-dot.done{background:var(--accent2);border-color:var(--accent2);color:var(--bg);}
+  .wk-dot.cur{background:var(--accent);border-color:var(--accent);color:var(--bg);}
+
+  .log-entry{background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:9px 12px;margin-bottom:7px;}
+  .log-entry-hdr{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:4px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:3px;}
+  .log-entry-body{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);line-height:1.7;}
+  .log-entry-body .sl{color:var(--text);}
+
+  .nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:100;}
+  .nav-btn{flex:1;padding:10px 5px;background:none;border:none;color:var(--dim);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .nav-btn.act{color:var(--accent);}
+  .nav-icon{font-size:14px;}
+
+  .rst-btn{font-family:'DM Mono',monospace;font-size:10px;padding:6px 13px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;border-radius:2px;margin-top:7px;}
+  .rst-btn:hover{border-color:var(--danger);color:var(--danger);}
+
+  @media(max-width:480px){.stat-grid{grid-template-columns:repeat(2,1fr);}.wk-grid{grid-template-columns:repeat(5,1fr);}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div>
+    <div class="hdr-title">Elk Hunt Training</div>
+    <div class="hdr-sub">Cooper · Colorado Oct 2026</div>
+  </div>
+  <div>
+    <div class="cd-num" id="cdNum">—</div>
+    <div class="cd-lbl">Days to Hunt</div>
+  </div>
+</header>
+
+<!-- WORKOUT VIEW -->
+<div class="view act" id="vWorkout">
+  <div class="wrap">
+    <div class="ph-bar" id="phBar">
+      <button class="ph-btn act" onclick="setPhase(1)">Phase 1 · Foundation</button>
+      <button class="ph-btn" onclick="setPhase(2)">Phase 2 · Build</button>
+      <button class="ph-btn" onclick="setPhase(3)">Phase 3 · Peak</button>
+      <button class="ph-btn" onclick="setPhase(4)">Phase 3 · Taper</button>
+    </div>
+    <div class="wk-bar" id="wkBar"></div>
+    <div id="wkContent"></div>
+    <button class="cmpl-btn" onclick="completeWeek()">Mark Week Complete ✓</button>
+  </div>
+</div>
+
+<!-- REFERENCE VIEW -->
+<div class="view" id="vRef">
+  <div class="wrap">
+    <div class="ref-sec">
+      <div class="ref-title">Weekly Structure</div>
+      <div class="ref-item"><strong>Tuesday / Thursday — Gym (60 min):</strong> Cardio first (25–30 min incline treadmill with pack, Zone 2), then strength (30 min, 5 exercises). Achilles protocol after.</div>
+      <div class="ref-item"><strong>Day 4 / Day 5 — Home or Outside (45–60 min):</strong> Pure Zone 2 aerobic only. Bleachers with pack when possible. Flat neighborhood walk with heavy pack when not. No strength work.</div>
+      <div class="ref-item"><strong>Saturday — Gym or Outside (90 min):</strong> Weighted ruck with maximum elevation change. Once per month: 2–3 hour long effort at Zone 2.</div>
+      <div class="ref-item"><strong>Day 4 / Day 5 flexibility:</strong> Do them on any two of Mon / Wed / Fri. Pick whichever days you can protect that week.</div>
+      <div class="ref-item"><strong>Bleachers:</strong> Descending under load is excellent downhill prep — eccentric quad loading is exactly what gets destroyed on mountain descents. Prioritize bleachers over flat walks whenever possible.</div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">Injury Flags — Stop & Assess</div>
+      <div class="flag"><div class="fdot"></div><div><strong>Right leg (hardware):</strong> Any twinge at or near tibial plateau under load — hard stop that exercise.</div></div>
+      <div class="flag"><div class="fdot"></div><div><strong>Right leg outer:</strong> Outer lower leg twinge during lateral load — reduce weight immediately.</div></div>
+      <div class="flag"><div class="fdot"></div><div><strong>Left knee:</strong> Any swelling after a session — reduce load and depth next session.</div></div>
+      <div class="flag"><div class="fdot"></div><div><strong>Left Achilles:</strong> Pain at heel insertion — pull the protocol, rest 4–5 days, restart flat ground only.</div></div>
+      <div class="flag"><div class="fdot"></div><div><strong>Left foot:</strong> Plantar fascia pain increasing — extra foot rolling, reduce ruck distance temporarily.</div></div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">Heart Rate Zones (Measured)</div>
+      <div class="hr-box">
+        <span class="z2">Zone 2 target: 137–148 bpm ← all base work stays here</span><br>
+        Surge target: 155–165 bpm for 30 sec only (Phase 2+ gym days)<br>
+        Above 148 on base work → back off grade or pace<br>
+        Below 137 → increase grade or pack weight<br>
+        Zones measured directly — not estimated from age formula<br>
+        Cardiac drift late in long sessions → drop grade, don't push through
+      </div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">5 Core Strength Exercises</div>
+      <div class="ref-item"><strong>Trap Bar Deadlift:</strong> Most hunt-specific lift. Simulates picking up a heavy pack or quartering an elk. Even bilateral loading respects right leg hardware.</div>
+      <div class="ref-item"><strong>Bulgarian Split Squat:</strong> Single-leg strength and stability on uneven terrain. Closes the bilateral strength gap between legs. Left leg shallow depth only — never chase range of motion.</div>
+      <div class="ref-item"><strong>Step-Up — Broken Leg Lead:</strong> Rebuilds right leg motor pattern and neuromuscular confidence. Directly simulates the climbing motion. Zero twinge rule.</div>
+      <div class="ref-item"><strong>Loaded Carry (Farmer or Pack):</strong> Trains the trunk stability, grip, and shoulder endurance that keeps you moving under 50 lbs hour after hour. Most underrated exercise in the program.</div>
+      <div class="ref-item"><strong>Pull-Ups:</strong> Upper back and lat strength for pack stability, rifle carry, and hauling yourself up steep pitches. Band-assisted to start — goal is 5–10 unassisted by October.</div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">Strength Progression Rules</div>
+      <div class="ref-item"><strong>Add weight</strong> when all sets/reps complete and last 2 reps don't feel hard. Never add weight and reps at the same time.</div>
+      <div class="ref-item"><strong>Broken leg (right):</strong> Governs step-up and split squat — don't force it. Twinge at tibial plateau = hard stop. Twinge in outer lower leg = reduce load.</div>
+      <div class="ref-item"><strong>Left knee:</strong> Shallow depth only on all knee flexion. Watch for swelling after sessions.</div>
+      <div class="ref-item"><strong>Loaded carry:</strong> Bilateral farmer carry only until right peroneal strength solid. Suitcase carry reintroduced at 20–25 lbs / 20 yards in Phase 2 only if symptom free.</div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">Rest Protocol (Strength Block)</div>
+      <div class="ref-item"><strong>Trap bar deadlift:</strong> 90–120 sec</div>
+      <div class="ref-item"><strong>Split squat / Step-up:</strong> 90 sec</div>
+      <div class="ref-item"><strong>Loaded carry:</strong> 60–90 sec</div>
+      <div class="ref-item"><strong>Pull-ups:</strong> 90 sec</div>
+      <div class="ref-item"><strong>Superset to save time:</strong> Step-up + Pull-ups (non-competing — lower body + upper body)</div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">Pull-Up Progression</div>
+      <div class="ref-item"><strong>Phase 1:</strong> Band-assisted 3×6–8. Progress to thinner bands until 3×3 unassisted possible.</div>
+      <div class="ref-item"><strong>Phase 2:</strong> Max unassisted reps first, finish with band. Add 1 unassisted rep per week.</div>
+      <div class="ref-item"><strong>Phase 3 Peak:</strong> Target 3×5–8 unassisted. Add load via vest/belt if reached, reset to 3×3.</div>
+      <div class="ref-item"><strong>Phase 3 Taper:</strong> Bodyweight only. 3×5. Maintain, don't push.</div>
+      <div class="ref-item"><em>Honest expectation: 5–10 unassisted pull-ups by October.</em></div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">Achilles & Plantar Fascia Protocol</div>
+      <div class="ref-item"><strong>When:</strong> After every Tuesday and Thursday session. All 6 months. Non-negotiable.</div>
+      <div class="ref-item"><strong>Foot roll:</strong> Lacrosse or golf ball, 2 min each foot, arch and heel. Do this first.</div>
+      <div class="ref-item"><strong>Straight-leg heel raise (flat ground):</strong> 3×15 · 2-sec up / 3-sec hold / 3-sec down to neutral. STOP AT NEUTRAL. No step. No below-neutral. Ever.</div>
+      <div class="ref-item"><strong>Bent-knee heel raise (flat ground):</strong> 3×15 · Same tempo. Targets soleus — likely culprit from last year's hunt.</div>
+      <div class="ref-item"><strong>No added weight.</strong> The controlled tempo is the load.</div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">Ruck & Altitude Notes</div>
+      <div class="ref-item">Zone 2 aerobic base is the best altitude prep available. Arrive in Colorado 1–2 days early. HR will run higher at altitude — trust feel over zones the first day or two.</div>
+      <div class="ref-item">Break in hunting boots during ruck sessions starting Month 3. Monitor left Achilles and plantar fascia for any response to boot heel drop change. Ruck in the same pack you'll hunt in.</div>
+      <div class="ref-item"><strong>Downhill prep:</strong> Bleacher descents under load are your best tool at sea level on flat terrain. The more sessions the better.</div>
+    </div>
+    <div class="ref-sec">
+      <div class="ref-title">Before Month 2 Begins</div>
+      <div class="ref-item"><strong>Orthopedist:</strong> Tell him you're doing progressive loaded carries and rucking to 50 lbs with hardware in the right tibial plateau. Ask what to watch for.</div>
+      <div class="ref-item"><strong>Sports medicine:</strong> Full picture — tibial plateau hardware, unaddressed left meniscus, insertional Achilles history, plantar fascia twinges, and this program. One visit gives you a confident foundation.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS VIEW -->
+<div class="view" id="vProg">
+  <div class="wrap">
+    <div class="stat-grid" id="statGrid"></div>
+    <div class="sec-lbl">26-Week Map</div>
+    <div class="wk-grid" id="wkMap"></div>
+    <button class="rst-btn" onclick="resetAll()">Reset All Progress & Logs</button>
+    <div style="margin-top:20px">
+      <div class="sec-lbl">Recent Workout Logs</div>
+      <div id="logHist"></div>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn act" onclick="showView('Workout',this)"><span class="nav-icon">🏔</span>Workout</button>
+  <button class="nav-btn" onclick="showView('Ref',this)"><span class="nav-icon">📋</span>Reference</button>
+  <button class="nav-btn" onclick="showView('Prog',this)"><span class="nav-icon">📈</span>Progress</button>
+</nav>
+
+<script>
+const HUNT = new Date('2026-10-12');
+const PHASES = {
+  1:{name:'Phase 1 · Foundation',weeks:8,label:'Months 1–2',color:'#8fad3f'},
+  2:{name:'Phase 2 · Build',weeks:8,label:'Months 3–4',color:'#c8a84b'},
+  3:{name:'Phase 3 · Peak',weeks:5,label:'Month 5',color:'#d4612a'},
+  4:{name:'Phase 3 · Taper',weeks:5,label:'Month 6',color:'#d4612a'},
+};
+const DAY_ORDER = ['tue','out','thu','sat'];
+
+// ─── WORKOUT DATA ─────────────────────────────────────────────────────────────
+
+const WU_P1 = [
+  {n:'Banded Hip Circles',d:'10 each direction, each leg',t:'bw'},
+  {n:'Leg Swings Front/Back',d:'10 each leg',t:'bw'},
+  {n:'Leg Swings Lateral',d:'10 each leg',t:'bw'},
+  {n:'Calf Raises (both legs)',d:'15 reps, normal tempo, flat ground',t:'bw'},
+  {n:'Box Step-Overs',d:'10 each leg, deliberate',t:'bw'},
+  {n:'Dead Bugs',d:'10 each side',t:'bw'},
+  {n:'Banded Ankle Eversions — right leg',d:'15 reps',nt:'Peroneal weakness — do not skip',t:'bw'},
+  {n:'Toe Curls with Towel',d:'3×15 each foot',nt:'Plantar fascia resilience',t:'bw'},
+];
+const WU_P2 = [...WU_P1,
+  {n:'Lateral Band Walks',d:'10 each direction',nt:'Added Phase 2+',t:'bw'},
+  {n:'Single-Leg Glute Bridges',d:'10 each leg',nt:'Added Phase 2+',t:'bw'},
+];
+const ACHILLES = [
+  {n:'Lacrosse/Golf Ball Foot Roll',d:'2 min each foot · Arch and heel',nt:'Do this first',t:'proto'},
+  {n:'Straight-Leg Heel Raise (flat ground)',d:'3×15 · 2-sec up / 3-sec hold / 3-sec to neutral — STOP AT NEUTRAL',nt:'No step. No below-neutral. Always.',t:'proto'},
+  {n:'Bent-Knee Heel Raise (flat ground)',d:'3×15 · Same tempo · Stop at neutral',nt:'Targets soleus',t:'proto'},
+];
+const MOBILITY = [
+  {n:'90/90 Hip Stretch',d:'60 sec each side',t:'proto'},
+  {n:'Couch Stretch',d:'60 sec each side',t:'proto'},
+  {n:'Downward Dog Calf Pedal',d:'30 sec',t:'proto'},
+  {n:'Single-Leg Calf Stretch (flat ground, slight knee bend)',d:'30 sec each side',t:'proto'},
+  {n:'Foam Roller Thoracic Extension',d:'10 slow extensions',t:'proto'},
+  {n:'Thread-the-Needle',d:'10 each side',t:'proto'},
+];
+
+function blk(name,exArr,green){
+  return {name,green:!!green,exercises:exArr.map(e=>({name:e.n,detail:e.d,note:e.nt||'',type:e.t||'bw'}))};
+}
+
+const WORKOUTS = {
+  1:{
+    tue:{title:'Tuesday — Gym',cssClass:'gym',blocks:[
+      blk('Warm-Up · 8–10 min · Once Through',WU_P1),
+      blk('Cardio First · 25–30 min',[ {n:'Incline Treadmill with Pack',d:'Start: 7% grade · 2.6 mph · 35 lbs · Zone 2 (137–148 bpm)',nt:'Add 5 min/week before touching grade or speed. Speed constant — grade is your only lever.',t:'cardio'} ],true),
+      blk('Strength · 30 min · 5 Exercises',[
+        {n:'Trap Bar Deadlift',d:'Start: 135 lbs · 3×6 · Should feel 7–8/10 effort · Add 10 lbs when all reps clean',t:'str'},
+        {n:'Bulgarian Split Squat',d:'Start: BW or 15 lb DBs · 3×8 each leg · Right leg forward, short stride, shallow',nt:'Left: shallow depth only. Watch for knee swelling after.',t:'str'},
+        {n:'Step-Up — Broken Leg (Right) Lead',d:'3×10 each leg · Start low box · 15–20 lb DBs each hand',nt:'Zero twinge rule. Progress box height before adding load.',t:'str'},
+        {n:'Bilateral Farmer Carry',d:'3×40 yards · Start 40–50 lbs each hand',nt:'No suitcase carry until right leg peroneal strength solid.',t:'str'},
+        {n:'Pull-Ups — Band Assisted',d:'3×6–8 · Band allows 6–8 clean reps · Rest 90 sec',nt:'Full hang. Chin over bar. Progress to thinner bands toward 3×3 unassisted.',t:'bw'},
+      ]),
+      blk('Achilles & Plantar Fascia Protocol',ACHILLES),
+    ]},
+    thu:{title:'Thursday — Gym',cssClass:'gym',blocks:[
+      blk('Warm-Up · 8–10 min · Once Through',WU_P1),
+      blk('Cardio First · 25–30 min',[ {n:'Incline Treadmill with Pack',d:'7% grade · 2.6 mph · 35 lbs · Zone 2 (137–148 bpm)',nt:'Same as Tuesday. Add 5 min/week.',t:'cardio'} ],true),
+      blk('Strength · 30 min · 5 Exercises',[
+        {n:'Trap Bar Deadlift',d:'3×6 · Same or progress from Tuesday',t:'str'},
+        {n:'Bulgarian Split Squat',d:'3×8 each leg',nt:'Left: shallow. Right: short stride.',t:'str'},
+        {n:'Step-Up — Broken Leg (Right) Lead',d:'3×10 each leg',nt:'Zero twinge rule',t:'str'},
+        {n:'Bilateral Farmer Carry',d:'3×40 yards',t:'str'},
+        {n:'Pull-Ups — Band Assisted',d:'3×6–8 · Rest 90 sec',t:'bw'},
+      ]),
+      blk('Achilles & Plantar Fascia Protocol',ACHILLES),
+    ]},
+    out:{title:'Day 4 / Day 5 — Outside or Home',cssClass:'outdoor',isOutdoor:true,blocks:[
+      blk('Zone 2 Aerobic Only · 45–60 min — No Strength',[
+        {n:'Bleacher Climbs with Pack',d:'Repeat climbs and descents · Pack weight builds over phases · Zone 2 (137–148 bpm)',nt:'Priority choice. Descending under load is excellent downhill prep for the mountain.',t:'cardio'},
+        {n:'Neighborhood Walk with Heavy Pack (if no bleachers)',d:'Flat but go heavier on pack to compensate · Zone 2 (137–148 bpm)',nt:'Heavier pack on flat terrain shifts demand toward trunk and shoulder endurance.',t:'cardio'},
+      ],true),
+    ]},
+    sat:{title:'Saturday — Ruck',cssClass:'sat',blocks:[
+      blk('Weighted Ruck · 90 min',[
+        {n:'Weighted Ruck',d:'Start: 30 lbs · 90 min · Varied terrain · Max elevation change available',nt:'Use your actual hunting pack. Break in hunting boots starting Month 3 — monitor left Achilles.',t:'cardio'},
+      ],true),
+      blk('Once Per Month — Replace with Long Aerobic Day',[
+        {n:'Long Hike or Ruck',d:'2–3 hours · Moderate pack · Max elevation change · Zone 2',nt:'Teaches sustained effort over hunt-length duration. Do not skip this monthly.',t:'cardio'},
+      ]),
+      blk('Finish Every Saturday',ACHILLES),
+    ]},
+  },
+  2:{
+    tue:{title:'Tuesday — Gym',cssClass:'gym',blocks:[
+      blk('Warm-Up · Phase 2 Version',WU_P2),
+      blk('Cardio First · 25–30 min with Surges',[ {n:'Incline Treadmill with Pack — Zone 2 + Surges',d:'Zone 2 (137–148 bpm) · Every 5 min: bump grade 3–4% for 30 sec · Speed constant',nt:'Target: HR 155–165 during surge, recover within 60–90 sec. Increase duration before load.',t:'cardio'} ],true),
+      blk('Strength · 30 min · 5 Exercises',[
+        {n:'Trap Bar Deadlift',d:'3×6 · Add 10 lbs when all reps clean · Working toward 185–225 lbs',t:'str'},
+        {n:'Bulgarian Split Squat',d:'3×8 each leg · Add load as right leg tolerates',nt:'Left: shallow depth only. Never chase range of motion.',t:'str'},
+        {n:'Step-Up w/ Knee Drive — Broken Leg Lead',d:'3×10 each leg · Progress load and height together',nt:'Left leg: monitor knee on landing',t:'str'},
+        {n:'Bilateral Farmer Carry or Pack Carry',d:'3×50 yards · Add weight weekly',nt:'Suitcase carry: 20–25 lbs / 20 yards only if right leg lateral stability solid. Outer lower leg twinge = stop.',t:'str'},
+        {n:'Pull-Ups — Transition Sets',d:'Max unassisted reps first, finish with band · 3 sets',nt:'Add 1 unassisted rep per week. This is the fastest way to build real pull-up strength.',t:'bw'},
+      ]),
+      blk('Achilles & Plantar Fascia Protocol',ACHILLES),
+    ]},
+    thu:{title:'Thursday — Gym',cssClass:'gym',blocks:[
+      blk('Warm-Up · Phase 2 Version',WU_P2),
+      blk('Cardio First · 25–30 min with Surges',[ {n:'Incline Treadmill with Pack — Zone 2 + Surges',d:'Zone 2 (137–148 bpm) · Surges every 5 min · Grade up 3–4% for 30 sec · Speed constant',t:'cardio'} ],true),
+      blk('Strength · 30 min · 5 Exercises',[
+        {n:'Trap Bar Deadlift',d:'3×6',t:'str'},
+        {n:'Bulgarian Split Squat',d:'3×8 each leg',nt:'Left: shallow. Right: short stride.',t:'str'},
+        {n:'Step-Up w/ Knee Drive',d:'3×10 each leg',t:'str'},
+        {n:'Bilateral Farmer Carry or Pack Carry',d:'3×50 yards',t:'str'},
+        {n:'Pull-Ups — Transition Sets',d:'Max unassisted + band finish · 3 sets',t:'bw'},
+      ]),
+      blk('Achilles & Plantar Fascia Protocol',ACHILLES),
+    ]},
+    out:{title:'Day 4 / Day 5 — Outside or Home',cssClass:'outdoor',isOutdoor:true,blocks:[
+      blk('Zone 2 Aerobic Only · 45–60 min — No Strength',[
+        {n:'Bleacher Climbs with Pack',d:'Phase 2: 25–35 lbs pack · Repeat climbs and descents · Zone 2 (137–148 bpm)',nt:'Add pack weight as fitness improves. Descending under load is critical downhill prep.',t:'cardio'},
+        {n:'Neighborhood Walk with Heavy Pack (if no bleachers)',d:'Phase 2: 30–40 lbs · Zone 2 (137–148 bpm)',nt:'Heavier pack compensates for flat terrain.',t:'cardio'},
+      ],true),
+    ]},
+    sat:{title:'Saturday — Ruck',cssClass:'sat',blocks:[
+      blk('Weighted Ruck · 90 min',[
+        {n:'Weighted Ruck',d:'Phase 2: 35–45 lbs · 90 min · Max elevation change available · Add 5 lbs every 2 weeks',nt:'Use actual hunting pack. Hunting boots from Month 3.',t:'cardio'},
+      ],true),
+      blk('Once Per Month — Replace with Long Aerobic Day',[
+        {n:'Long Hike or Ruck',d:'2–3 hours · Moderate pack · Max elevation change · Zone 2',nt:'Do not skip this monthly session',t:'cardio'},
+      ]),
+      blk('Finish Every Saturday',ACHILLES),
+    ]},
+  },
+  3:{
+    tue:{title:'Tuesday — Gym',cssClass:'gym',blocks:[
+      blk('Warm-Up · Phase 2 Version',WU_P2),
+      blk('Cardio First · 25–30 min with Surges',[ {n:'Incline Treadmill or Stairmaster with Pack',d:'25–35 lbs · Zone 2 with surges · Simulate morning uphill push',nt:'Most hunt-specific cardio in the program',t:'cardio'} ],true),
+      blk('Strength · 30 min — Heavy, Low Reps',[
+        {n:'Trap Bar Deadlift',d:'4–5 rep sets · Heaviest loads of the program',t:'str'},
+        {n:'Bulgarian Split Squat',d:'4–5 rep sets · Heavier than Phase 2',nt:'Left: depth controlled regardless of load. Right: short stride.',t:'str'},
+        {n:'Step-Up w/ Knee Drive — Broken Leg Lead',d:'4–5 rep sets · Heavier',t:'str'},
+        {n:'Farmer Carry or Pack Carry',d:'3×50 yards · Heaviest loads of program',nt:'Suitcase carry only if right leg symptom free through Phase 2',t:'str'},
+        {n:'Pull-Ups',d:'Target: 3×5–8 unassisted · Add load via vest/belt if reached, reset to 3×3–4',t:'bw'},
+      ]),
+      blk('Mobility & Recovery · 10 min — Every Session from Phase 3',MOBILITY),
+      blk('Achilles & Plantar Fascia Protocol',ACHILLES),
+    ]},
+    thu:{title:'Thursday — Gym',cssClass:'gym',blocks:[
+      blk('Warm-Up · Phase 2 Version',WU_P2),
+      blk('Cardio First · 25–30 min with Surges',[ {n:'Incline Treadmill or Stairmaster with Pack',d:'25–35 lbs · Zone 2 with surges',t:'cardio'} ],true),
+      blk('Strength · 30 min — Heavy',[
+        {n:'Trap Bar Deadlift',d:'4–5 rep sets · Heaviest',t:'str'},
+        {n:'Bulgarian Split Squat',d:'4–5 rep sets · Heavy',nt:'Left: depth controlled. Right: short stride.',t:'str'},
+        {n:'Step-Up w/ Knee Drive',d:'4–5 rep sets · Heavy',t:'str'},
+        {n:'Farmer Carry or Pack Carry',d:'3×50 yards · Heaviest',t:'str'},
+        {n:'Pull-Ups',d:'3×5–8 unassisted target',t:'bw'},
+      ]),
+      blk('Mobility & Recovery · 10 min',MOBILITY),
+      blk('Achilles & Plantar Fascia Protocol',ACHILLES),
+    ]},
+    out:{title:'Day 4 / Day 5 — Outside or Home',cssClass:'outdoor',isOutdoor:true,blocks:[
+      blk('Zone 2 Aerobic Only · 50–60 min — No Strength',[
+        {n:'Bleacher Climbs with Pack',d:'Phase 3: 40–50 lbs pack · Repeat climbs and descents · Zone 2 (137–148 bpm)',nt:'Peak phase. This is as close to hunt simulation as you can get at sea level.',t:'cardio'},
+        {n:'Neighborhood Walk with Heavy Pack (if no bleachers)',d:'Phase 3: 40–50 lbs · Zone 2 (137–148 bpm)',t:'cardio'},
+      ],true),
+    ]},
+    sat:{title:'Saturday — Peak Ruck',cssClass:'sat',blocks:[
+      blk('Big Ruck — Do Twice This Month',[
+        {n:'Peak Ruck',d:'50 lbs · 90 min · Maximum elevation change available (stairs, garage, trails)',nt:'Closest thing to hunt day you will do in training.',t:'cardio'},
+      ],true),
+      blk('Once Per Month — Long Aerobic Day',[
+        {n:'Long Hike or Ruck',d:'2–3 hours · Moderate pack · Max elevation change · Zone 2',nt:'Do not skip monthly',t:'cardio'},
+      ]),
+      blk('Finish Every Saturday',ACHILLES),
+    ]},
+  },
+  4:{
+    tue:{title:'Tuesday — Gym',cssClass:'gym',blocks:[
+      blk('Warm-Up · Phase 2 Version',WU_P2),
+      blk('Cardio First · 20 min — Lighter',[ {n:'Incline Treadmill with Pack',d:'20 lb pack · Zone 2 only · No surges · Sharpening not building',nt:'2 weeks before departure: 30 min easy incline walk, 20 lbs, no heavy lifting.',t:'cardio'} ],true),
+      blk('Strength · 25 min — Drop One Set Per Exercise',[
+        {n:'Trap Bar Deadlift',d:'3–4 rep sets · One fewer set than Phase 3',t:'str'},
+        {n:'Bulgarian Split Squat',d:'3–4 rep sets · One fewer set',t:'str'},
+        {n:'Step-Up w/ Knee Drive',d:'3–4 rep sets · One fewer set',t:'str'},
+        {n:'Farmer Carry or Pack Carry',d:'2×50 yards',t:'str'},
+        {n:'Pull-Ups',d:'Bodyweight only · 3×5 · Maintain, do not push',t:'bw'},
+      ]),
+      blk('Mobility & Recovery · 10 min — Every Session',MOBILITY),
+      blk('Achilles & Plantar Fascia Protocol',ACHILLES),
+    ]},
+    thu:{title:'Thursday — Gym',cssClass:'gym',blocks:[
+      blk('Warm-Up · Phase 2 Version',WU_P2),
+      blk('Cardio First · 20 min',[ {n:'Incline Treadmill with Pack',d:'20 lb pack · Zone 2 only · Easy effort',t:'cardio'} ],true),
+      blk('Strength · 25 min — Taper',[
+        {n:'Trap Bar Deadlift',d:'3–4 rep sets',t:'str'},
+        {n:'Bulgarian Split Squat',d:'3–4 rep sets',t:'str'},
+        {n:'Step-Up w/ Knee Drive',d:'3–4 rep sets',t:'str'},
+        {n:'Farmer Carry or Pack Carry',d:'2×50 yards',t:'str'},
+        {n:'Pull-Ups',d:'Bodyweight · 3×5',t:'bw'},
+      ]),
+      blk('Mobility & Recovery · 10 min',MOBILITY),
+      blk('Achilles & Plantar Fascia Protocol',ACHILLES),
+    ]},
+    out:{title:'Day 4 / Day 5 — Outside or Home',cssClass:'outdoor',isOutdoor:true,blocks:[
+      blk('Zone 2 Aerobic Only · 40–45 min — Taper',[
+        {n:'Bleacher Climbs or Walk with Pack',d:'Taper: 30–35 lbs pack · Easy Zone 2 (137–148 bpm) · 40–45 min',nt:'2 weeks before departure: reduce to 30 min easy walk, 20 lbs.',t:'cardio'},
+      ],true),
+    ]},
+    sat:{title:'Saturday — Taper Ruck',cssClass:'sat',blocks:[
+      blk('Taper Ruck',[
+        {n:'Weighted Ruck',d:'35–40 lbs · 60 min · Varied terrain',nt:'2 weeks before departure: 30 min easy hike / 20 lbs only.',t:'cardio'},
+      ],true),
+      blk('Finish Every Saturday',ACHILLES),
+    ]},
+  },
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let ST = JSON.parse(localStorage.getItem('elk_v4')||'null') || {phase:1,week:1,done:[],checks:{},logs:{}};
+const save = () => localStorage.setItem('elk_v4', JSON.stringify(ST));
+
+// ─── COUNTDOWN ───────────────────────────────────────────────────────────────
+function updateCD() {
+  document.getElementById('cdNum').textContent = Math.max(0,Math.ceil((HUNT-new Date())/86400000));
+}
+
+// ─── VIEWS ───────────────────────────────────────────────────────────────────
+function showView(name, btn) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('act'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('act'));
+  document.getElementById('v'+name).classList.add('act');
+  btn.classList.add('act');
+  if(name==='Prog') renderProg();
+}
+
+// ─── PHASE & WEEK ────────────────────────────────────────────────────────────
+function setPhase(p) { ST.phase=p; ST.week=1; save(); renderPhaseBar(); renderWkBar(); renderWorkout(); }
+function setWeek(w) { ST.week=w; save(); renderWkBar(); renderWorkout(); }
+
+function renderPhaseBar() {
+  document.querySelectorAll('.ph-btn').forEach((b,i)=>b.classList.toggle('act',i+1===ST.phase));
+}
+
+function renderWkBar() {
+  const ph=PHASES[ST.phase];
+  const bar=document.getElementById('wkBar');
+  bar.innerHTML='';
+  for(let i=1;i<=ph.weeks;i++){
+    const key=`p${ST.phase}w${i}`;
+    const btn=document.createElement('button');
+    btn.className='wk-btn'+(i===ST.week?' act':'')+(ST.done.includes(key)?' done':'');
+    btn.textContent='Wk '+i;
+    btn.onclick=()=>setWeek(i);
+    bar.appendChild(btn);
+  }
+}
+
+// ─── WORKOUT RENDER ──────────────────────────────────────────────────────────
+function renderWorkout() {
+  const ph=PHASES[ST.phase];
+  const data=WORKOUTS[ST.phase];
+  const c=document.getElementById('wkContent');
+  const badge=`<div class="ph-badge" style="background:${ph.color}22;color:${ph.color};border:1px solid ${ph.color}44">${ph.name} · ${ph.label}</div>`;
+  c.innerHTML=badge+DAY_ORDER.map(k=>renderDayCard(k,data[k])).join('');
+  c.querySelector('.day-card').classList.add('open');
+  updateAllProg();
+}
+
+function renderDayCard(dayKey, day) {
+  const pwk=`p${ST.phase}w${ST.week}`;
+  const isOut=day.isOutdoor;
+  const blocksHtml=day.blocks.map((blk,bi)=>{
+    const exHtml=blk.exercises.map((ex,ei)=>{
+      const id=`${pwk}_${dayKey}_${bi}_${ei}`;
+      const chk=ST.checks[id]?'on':'';
+      const done=ST.checks[id]?'done':'';
+      return `<div class="ex ${done}" id="ex_${id}">
+        <div class="ex-top">
+          <div class="chk ${chk}" onclick="toggleChk('${id}','${dayKey}')"></div>
+          <div style="flex:1">
+            <div class="ex-name">${ex.name}</div>
+            <div class="ex-detail">${ex.detail}</div>
+            ${ex.note?`<div class="ex-note">⚠ ${ex.note}</div>`:''}
+          </div>
+        </div>
+        ${(ex.type==='str'||ex.type==='bw'||ex.type==='cardio')?renderLogPanel(id,ex.type):''}
+      </div>`;
+    }).join('');
+    return `<div class="blk">
+      <div class="blk-title ${blk.green?'green':''}">${blk.name}</div>
+      ${exHtml}
+    </div>`;
+  }).join('');
+
+  return `<div class="day-card ${isOut?'outdoor':''}" id="card_${dayKey}">
+    <div class="day-hdr" onclick="toggleCard('${dayKey}')">
+      <div class="day-title ${day.cssClass}">${day.title}</div>
+      <div class="day-prog">
+        <div class="prog-bar"><div class="prog-fill" id="pf_${dayKey}" style="width:0%"></div></div>
+        <div class="prog-txt" id="pt_${dayKey}">0%</div>
+        <div class="chv">▼</div>
+      </div>
+    </div>
+    <div class="day-body">${blocksHtml}</div>
+  </div>`;
+}
+
+function renderLogPanel(id, type) {
+  const ex=ST.logs[id];
+  let lastHtml='';
+  if(ex&&ex.saved){
+    if(type==='cardio'&&ex.cardio){
+      const c=ex.cardio;
+      lastHtml=`<div class="last-log">Last: <span class="lv">${c.duration||'—'} min${c.grade?' · '+c.grade+'%':''}${c.speed?' · '+c.speed+' mph':''}${c.weight?' · '+c.weight+' lbs':''}${c.hr?' · '+c.hr+' bpm':''}</span>${c.note?'<br>'+c.note:''}</div>`;
+    } else if(ex.sets&&ex.sets.length){
+      const lines=ex.sets.map((s,i)=>`S${i+1}: <span class="lv">${s.weight?s.weight+'lbs · ':''}${s.reps||'—'} reps${s.note?' · '+s.note:''}</span>`).join('<br>');
+      lastHtml=`<div class="last-log">Last:<br>${lines}</div>`;
+    }
+  }
+
+  const showWt=type==='str';
+  let panelContent='';
+  if(type==='cardio'){
+    const c=(ex&&ex.cardio)?ex.cardio:{};
+    panelContent=`<div class="cardio-fields">
+      <div class="cf-wrap"><div class="cf-lbl">Min</div><input class="cf" id="cl_dur_${id}" type="number" placeholder="min" value="${c.duration||''}"></div>
+      <div class="cf-wrap"><div class="cf-lbl">Grade%</div><input class="cf" id="cl_gr_${id}" type="number" placeholder="%" value="${c.grade||''}"></div>
+      <div class="cf-wrap"><div class="cf-lbl">MPH</div><input class="cf" id="cl_sp_${id}" type="number" placeholder="mph" value="${c.speed||''}"></div>
+      <div class="cf-wrap"><div class="cf-lbl">Pack lbs</div><input class="cf" id="cl_wt_${id}" type="number" placeholder="lbs" value="${c.weight||''}"></div>
+      <div class="cf-wrap"><div class="cf-lbl">Avg HR</div><input class="cf" id="cl_hr_${id}" type="number" placeholder="bpm" value="${c.hr||''}"></div>
+    </div>
+    <input class="note-fld" id="cl_nt_${id}" type="text" placeholder="Notes (how it felt, zone easy/hard, etc.)" value="${c.note||''}" style="width:100%;margin-bottom:7px">`;
+  } else {
+    const sets=(ex&&ex.sets)?ex.sets:[{weight:'',reps:'',note:''}];
+    const setsHtml=sets.map((s,i)=>mkSetRow(id,i,s,showWt)).join('');
+    panelContent=`<div class="sets-con" id="sc_${id}">${setsHtml}</div>`;
+  }
+
+  return `<div class="log-toggle" onclick="toggleLog('${id}')">+ Log workout</div>
+    <div class="log-panel" id="lp_${id}">
+      ${panelContent}
+      <div class="log-actions">
+        ${type!=='cardio'?`<button class="add-btn" onclick="addSet('${id}',${showWt})">+ Set</button>
+        <button class="rem-btn" onclick="remSet('${id}',${showWt})">− Set</button>`:''}
+        <button class="save-btn" onclick="saveLog('${id}','${type}')">Save</button>
+        <span class="save-conf" id="sc2_${id}">Saved ✓</span>
+      </div>
+      ${lastHtml}
+    </div>`;
+}
+
+function mkSetRow(id,idx,s,showWt){
+  const wf=showWt?`<input class="set-fld" type="number" placeholder="lbs" value="${s.weight||''}" onchange="updSet(this,'${id}',${idx},'weight')"><span class="set-unit">lbs</span>`:'';
+  return `<div class="set-row" id="sr_${id}_${idx}">
+    <span class="set-lbl">Set ${idx+1}</span>
+    ${wf}
+    <input class="set-fld" type="number" placeholder="reps" value="${s.reps||''}" onchange="updSet(this,'${id}',${idx},'reps')">
+    <span class="set-unit">reps</span>
+    <input class="note-fld" type="text" placeholder="note" value="${s.note||''}" onchange="updSet(this,'${id}',${idx},'note')">
+  </div>`;
+}
+
+function updSet(el,id,idx,field){
+  if(!ST.logs[id])ST.logs[id]={sets:[],saved:false};
+  if(!ST.logs[id].sets)ST.logs[id].sets=[];
+  while(ST.logs[id].sets.length<=idx)ST.logs[id].sets.push({weight:'',reps:'',note:''});
+  ST.logs[id].sets[idx][field]=el.value;
+  save();
+}
+
+function toggleLog(id){
+  const p=document.getElementById('lp_'+id);
+  const t=p.previousElementSibling;
+  p.classList.toggle('open');
+  t.textContent=p.classList.contains('open')?'− Log workout':'+ Log workout';
+}
+
+function addSet(id,showWt){
+  if(!ST.logs[id])ST.logs[id]={sets:[{weight:'',reps:'',note:''}],saved:false};
+  if(!ST.logs[id].sets)ST.logs[id].sets=[{weight:'',reps:'',note:''}];
+  ST.logs[id].sets.push({weight:'',reps:'',note:''});
+  save();
+  const con=document.getElementById('sc_'+id);
+  con.insertAdjacentHTML('beforeend',mkSetRow(id,ST.logs[id].sets.length-1,{weight:'',reps:'',note:''},showWt));
+}
+
+function remSet(id,showWt){
+  if(!ST.logs[id]||!ST.logs[id].sets||ST.logs[id].sets.length<=1)return;
+  ST.logs[id].sets.pop();save();
+  const con=document.getElementById('sc_'+id);
+  const rows=con.querySelectorAll('.set-row');
+  if(rows.length>1)rows[rows.length-1].remove();
+}
+
+function saveLog(id,type){
+  if(!ST.logs[id])ST.logs[id]={};
+  if(type==='cardio'){
+    ST.logs[id].cardio={
+      duration:document.getElementById('cl_dur_'+id)?.value||'',
+      grade:document.getElementById('cl_gr_'+id)?.value||'',
+      speed:document.getElementById('cl_sp_'+id)?.value||'',
+      weight:document.getElementById('cl_wt_'+id)?.value||'',
+      hr:document.getElementById('cl_hr_'+id)?.value||'',
+      note:document.getElementById('cl_nt_'+id)?.value||'',
+    };
+  }
+  ST.logs[id].saved=true;
+  ST.logs[id].timestamp=new Date().toISOString();
+  ST.logs[id].type=type;
+  save();
+  const conf=document.getElementById('sc2_'+id);
+  if(conf){conf.style.display='inline';setTimeout(()=>conf.style.display='none',2000);}
+}
+
+function toggleCard(k){ document.getElementById('card_'+k)?.classList.toggle('open'); }
+
+function toggleChk(id,dayKey){
+  ST.checks[id]=!ST.checks[id];save();
+  const box=document.querySelector(`#ex_${id} .chk`);
+  const ex=document.getElementById('ex_'+id);
+  if(box)box.classList.toggle('on',ST.checks[id]);
+  if(ex)ex.classList.toggle('done',ST.checks[id]);
+  updateDayProg(dayKey);
+}
+
+function updateDayProg(dayKey){
+  const pwk=`p${ST.phase}w${ST.week}`;
+  const prefix=`${pwk}_${dayKey}_`;
+  const day=WORKOUTS[ST.phase][dayKey];
+  let total=0; day.blocks.forEach(b=>total+=b.exercises.length);
+  const done=Object.keys(ST.checks).filter(k=>k.startsWith(prefix)&&ST.checks[k]).length;
+  const pct=total>0?Math.round((done/total)*100):0;
+  const bar=document.getElementById('pf_'+dayKey);
+  const txt=document.getElementById('pt_'+dayKey);
+  if(bar)bar.style.width=pct+'%';
+  if(txt)txt.textContent=pct+'%';
+}
+
+function updateAllProg(){ DAY_ORDER.forEach(d=>updateDayProg(d)); }
+
+// ─── WEEK COMPLETE ────────────────────────────────────────────────────────────
+function completeWeek(){
+  const key=`p${ST.phase}w${ST.week}`;
+  if(!ST.done.includes(key))ST.done.push(key);
+  save(); renderWkBar();
+  if(ST.week<PHASES[ST.phase].weeks){ ST.week++; save(); renderWkBar(); renderWorkout(); }
+}
+
+// ─── PROGRESS ─────────────────────────────────────────────────────────────────
+function renderProg(){
+  const total=Object.values(PHASES).reduce((s,p)=>s+p.weeks,0);
+  const comp=ST.done.length;
+  document.getElementById('statGrid').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${comp}</div><div class="stat-lbl">Weeks Done</div></div>
+    <div class="stat-card"><div class="stat-num">${total-comp}</div><div class="stat-lbl">Weeks Left</div></div>
+    <div class="stat-card"><div class="stat-num">${Math.round((comp/total)*100)}%</div><div class="stat-lbl">Complete</div></div>
+    <div class="stat-card"><div class="stat-num">${ST.phase}</div><div class="stat-lbl">Phase</div></div>`;
+
+  const map=document.getElementById('wkMap'); map.innerHTML='';
+  let wn=0;
+  [1,2,3,4].forEach(ph=>{
+    for(let w=1;w<=PHASES[ph].weeks;w++){
+      wn++;
+      const key=`p${ph}w${w}`;
+      const isDone=ST.done.includes(key);
+      const isCur=ph===ST.phase&&w===ST.week;
+      const dot=document.createElement('div');
+      dot.className='wk-dot'+(isDone?' done':isCur?' cur':'');
+      dot.title=`Ph${ph} Wk${w}`;
+      dot.textContent=wn;
+      map.appendChild(dot);
+    }
+  });
+
+  // Build exercise name lookup
+  const nameMap={};
+  [1,2,3,4].forEach(ph=>DAY_ORDER.forEach(day=>{
+    WORKOUTS[ph][day].blocks.forEach((b,bi)=>b.exercises.forEach((ex,ei)=>{
+      nameMap[`ph${ph}_${day}_${bi}_${ei}`]=ex.name;
+    }));
+  }));
+
+  const entries=Object.entries(ST.logs)
+    .filter(([,v])=>v.saved&&v.timestamp)
+    .sort((a,b)=>new Date(b[1].timestamp)-new Date(a[1].timestamp))
+    .slice(0,20);
+
+  const hist=document.getElementById('logHist');
+  if(!entries.length){
+    hist.innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--dim);padding:12px 0">No logs yet. Tap + Log workout on any exercise.</div>';
+    return;
+  }
+  hist.innerHTML=entries.map(([id,entry])=>{
+    const m=id.match(/^p(\d+)w(\d+)_([a-z]+)_(\d+)_(\d+)$/);
+    const loc=m?`Ph${m[1]} Wk${m[2]} · ${m[3].toUpperCase()}`:'';
+    const exName=m?nameMap[`ph${m[1]}_${m[3]}_${m[4]}_${m[5]}`]||'':id;
+    const date=new Date(entry.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    let body='';
+    if(entry.type==='cardio'&&entry.cardio){
+      const c=entry.cardio;
+      body=[c.duration?c.duration+' min':'',c.grade?c.grade+'%':'',c.speed?c.speed+' mph':'',c.weight?c.weight+' lbs':'',c.hr?c.hr+' bpm':''].filter(Boolean).join(' · ');
+      if(c.note)body+=' · '+c.note;
+    } else if(entry.sets){
+      body=entry.sets.map((s,i)=>`<span class="sl">S${i+1}: ${s.weight?s.weight+'lbs ':''}${s.reps||'—'} reps${s.note?' · '+s.note:''}</span>`).join(' | ');
+    }
+    return `<div class="log-entry">
+      <div class="log-entry-hdr"><span>${loc}</span><span>${date}</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:3px">${exName}</div>
+      <div class="log-entry-body">${body||'—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function resetAll(){
+  if(confirm('Reset all progress and logs? This cannot be undone.')){
+    ST={phase:1,week:1,done:[],checks:{},logs:{}};
+    save(); setPhase(1); renderProg();
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+updateCD();
+setInterval(updateCD,60000);
+renderPhaseBar();
+renderWkBar();
+renderWorkout();
+</script>
+</body>
+</html>
